@@ -66,7 +66,7 @@ const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
 
   const token = jwt.sign(
     { id: user._id, email: user.email },
-    process.env.JWT_SECURE || 'My super secure key',
+    process.env.JWT_SECURE as string,
     { expiresIn: '1h' }
   );
 
