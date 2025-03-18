@@ -21,14 +21,23 @@ const userSchema = new mongoose.Schema<IUser>(
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  try {
-    this.password = await bcrypt.hash(this.password, 12);
-    next();
-  } catch (error: unknown) {
-    next(error as mongoose.CallbackError);
-  }
+
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
+userSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], async function (next) {
+  const update = this.getUpdate() as Partial<IUser>;
+
+  if (update.password) {
+    const salt = await bcrypt.genSalt(12);
+    update.password = await bcrypt.hash(update.password, salt);
+    this.setUpdate(update); // Set the updated password
+  }
+
+  next();
+});
 const User = mongoose.model<IUser>('User', userSchema);
 
 const userZodSchema = z.object({
