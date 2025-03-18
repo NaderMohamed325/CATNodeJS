@@ -5,13 +5,6 @@ const authRouter = express.Router();
 
 /**
  * @swagger
- * tags:
- *   name: Auth
- *   description: Authentication related endpoints
- */
-
-/**
- * @swagger
  * /auth/register:
  *   post:
  *     summary: Register a new user
@@ -64,6 +57,7 @@ const authRouter = express.Router();
  *       400:
  *         description: Bad request (Invalid input or missing fields)
  */
+authRouter.post('/auth/register', registerUser);
 
 /**
  * @swagger
@@ -105,6 +99,7 @@ const authRouter = express.Router();
  *       400:
  *         description: Bad request (Missing fields)
  */
+authRouter.post('/auth/login', loginUser);
 
 /**
  * @swagger
@@ -124,8 +119,6 @@ const authRouter = express.Router();
  *                   type: string
  *                   example: "Logged out successfully"
  */
-authRouter.post('/auth/register', registerUser);
-authRouter.post('/auth/login', loginUser);
-authRouter.post('/auth/logout', logoutUser); 
+authRouter.post('/auth/logout', logoutUser);
 
 export { authRouter };
