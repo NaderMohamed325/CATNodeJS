@@ -1,5 +1,5 @@
 import express from 'express';
-import { loginUser, registerUser } from '../controller/authController';
+import { loginUser, logoutUser, registerUser } from '../controller/authController';
 
 const authRouter = express.Router();
 
@@ -100,16 +100,32 @@ const authRouter = express.Router();
  *                 message:
  *                   type: string
  *                   example: "Login successful"
- *                 token:
- *                   type: string
- *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *       401:
  *         description: Unauthorized (Invalid credentials)
  *       400:
  *         description: Bad request (Missing fields)
  */
 
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout a user by clearing the authentication cookie
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: User logged out successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Logged out successfully"
+ */
 authRouter.post('/auth/register', registerUser);
 authRouter.post('/auth/login', loginUser);
+authRouter.post('/auth/logout', logoutUser); 
 
 export { authRouter };
