@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import express, { Request, Response } from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
@@ -6,6 +8,7 @@ import { setupSwagger } from './swagger';
 import { errorHandler } from './utils/errorHandler';
 import mongoose from 'mongoose';
 import { authRouter } from './routes/authRoute';
+import xXssProtection  from 'x-xss-protection';
 //---------------------------------------------------------------------------//
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -19,6 +22,8 @@ mongoose.connect('mongodb://localhost:27017/E-Commerce').then(() => {
 });
 //---------------------------------------------------------------------------//
 const app = express();
+app.use(xXssProtection())
+app.disable('x-powered-by')
 app.use(helmet());
 app.use(limiter);
 app.use(express.json());
