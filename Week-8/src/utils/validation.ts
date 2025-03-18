@@ -1,5 +1,7 @@
 import { z } from 'zod';
-import { Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { catchAsync } from './catchAsync';
 
 const zodSchemaValidate = (data: any, schema: z.ZodSchema, res: Response) => {
   const result = schema.safeParse(data);
@@ -9,4 +11,23 @@ const zodSchemaValidate = (data: any, schema: z.ZodSchema, res: Response) => {
   return result.data;
 };
 
-export { zodSchemaValidate };
+const authenticate =  catchAsync(async(req: Request, res: Response, next: NextFunction) => {
+
+  const token = req.header('Authorization')?.split(' ')[1];
+
+  if (!token) {
+    res.status(401).json({
+      message: 'Unauthorized , missing token',
+    });
+  }
+  const tokenStatus = jwt.verify(token as string, process.env.JWT_SECURE as string );
+  console.log(tokenStatus);
+  if (!tokenStatus) {
+    return res.status(401).json({
+      message: 'Unauthorized, invalid token',
+    });
+  }
+  next();
+});
+
+export { zodSchemaValidate, authenticate };
