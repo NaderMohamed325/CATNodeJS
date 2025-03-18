@@ -8,7 +8,8 @@ import { setupSwagger } from './swagger';
 import { errorHandler } from './utils/errorHandler';
 import mongoose from 'mongoose';
 import { authRouter } from './routes/authRoute';
-import xXssProtection  from 'x-xss-protection';
+import xXssProtection from 'x-xss-protection';
+import { userRouter } from './routes/userRoute';
 //---------------------------------------------------------------------------//
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -22,8 +23,8 @@ mongoose.connect('mongodb://localhost:27017/E-Commerce').then(() => {
 });
 //---------------------------------------------------------------------------//
 const app = express();
-app.use(xXssProtection())
-app.disable('x-powered-by')
+app.use(xXssProtection());
+app.disable('x-powered-by');
 app.use(helmet());
 app.use(limiter);
 app.use(express.json());
@@ -32,7 +33,7 @@ app.use(morgan('dev'));
 // Swagger setup
 setupSwagger(app);
 app.use(authRouter);
-
+app.use(userRouter);
 app.use(errorHandler);
 
 //---------------------------------------------------------------------------//
