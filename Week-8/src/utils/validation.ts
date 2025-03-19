@@ -11,8 +11,7 @@ const zodSchemaValidate = (data: any, schema: z.ZodSchema, res: Response) => {
   return result.data;
 };
 
-const authenticate =  catchAsync(async(req: Request, res: Response, next: NextFunction) => {
-
+const authenticate = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const token = req.header('Authorization')?.split(' ')[1];
 
   if (!token) {
@@ -20,7 +19,7 @@ const authenticate =  catchAsync(async(req: Request, res: Response, next: NextFu
       message: 'Unauthorized , missing token',
     });
   }
-  const tokenStatus = jwt.verify(token as string, process.env.JWT_SECURE as string );
+  const tokenStatus = jwt.verify(token as string, process.env.JWT_SECURE as string);
   console.log(tokenStatus);
   if (!tokenStatus) {
     return res.status(401).json({
@@ -30,4 +29,15 @@ const authenticate =  catchAsync(async(req: Request, res: Response, next: NextFu
   next();
 });
 
-export { zodSchemaValidate, authenticate };
+const adminRouteProtect = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const role = req.user?.role;
+  if (role === 'admin') {
+    next();
+  } else if (role === 'user') {
+    return res.status(403).json({
+      status: 'fail',
+      message: 'Contact e-commerce@io.com',
+    });
+  }
+});
+export { zodSchemaValidate, authenticate,adminRouteProtect };
