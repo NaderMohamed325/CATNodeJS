@@ -78,4 +78,6 @@ const updateUserProfile = catchAsync(async (req: Request, res: Response, next: N
   }
 });
 
+
+
 export { getUserProfile, updateUserProfile };
