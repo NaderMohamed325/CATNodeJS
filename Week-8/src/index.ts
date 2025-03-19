@@ -10,7 +10,8 @@ import mongoose from 'mongoose';
 import { authRouter } from './routes/authRoute';
 import xXssProtection from 'x-xss-protection';
 import { userRouter } from './routes/userRoute';
-//---------------------------------------------------------------------------//
+import { createAdminAccount } from './models/adminModel';
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 100,
@@ -20,8 +21,9 @@ const limiter = rateLimit({
 
 mongoose.connect('mongodb://localhost:27017/E-Commerce').then(() => {
   console.log('DB connected');
+  createAdminAccount(); // Ensure this is called after the DB connection is established
 });
-//---------------------------------------------------------------------------//
+
 const app = express();
 app.use(xXssProtection());
 app.disable('x-powered-by');
@@ -36,10 +38,10 @@ app.use(authRouter);
 app.use(userRouter);
 app.use(errorHandler);
 
-//---------------------------------------------------------------------------//
 app.all('*', (_req, res: Response) => {
   res.status(404).send({ error: 'Not Found' });
 });
+
 app.listen(5000, () => {
   console.log('Server running on http://localhost:5000');
 });
