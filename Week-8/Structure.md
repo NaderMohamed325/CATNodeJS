@@ -7,7 +7,6 @@ PUT /users/profile – Update user profile
 GET /users – Get all users (admin only)
 DELETE /users/{id} – Delete a user (admin only)
 
-
 Products
 GET /products – Get all products
 GET /products/{id} – Get a single product
@@ -21,14 +20,12 @@ POST /categories – Create a new category (admin only)
 PUT /categories/{id} – Update a category (admin only)
 DELETE /categories/{id} – Delete a category (admin only)
 
-
 Cart
 GET /cart – Get user cart
 POST /cart – Add item to cart
 PUT /cart/{id} – Update cart item quantity
 DELETE /cart/{id} – Remove item from cart
 DELETE /cart/clear – Clear all items from cart
-
 
 Orders
 POST /orders – Place an order
@@ -37,18 +34,15 @@ GET /orders/{id} – Get a single order
 PUT /orders/{id} – Update order status (admin only)
 DELETE /orders/{id} – Cancel order
 
-
 Reviews & Ratings
 POST /products/{id}/reviews – Add a review
 GET /products/{id}/reviews – Get product reviews
 DELETE /reviews/{id} – Delete a review (admin/user)
 
-
 Admin Dashboard (Optional)
 GET /admin/dashboard – Get sales & user statistics
 GET /admin/orders – Get all orders
 GET /admin/products – Get all products
-
 
 ## Status Codes
 
