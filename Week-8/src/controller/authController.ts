@@ -4,28 +4,21 @@ import { Request, Response, NextFunction } from 'express';
 import { zodSchemaValidate } from '../utils/validation';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { AppError } from '../utils/appError';
+
 const registerUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  /*
-  username: string;
-  email: string;
-  password: string;
-*/
   const { username, email, password } = req.body;
   const userData = { username, email, password };
+
   if (!username || !email || !password) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Please fill the form',
-    });
+    return next(new AppError('Please fill the form', 400));
   }
+
   const validation = zodSchemaValidate(userData, userZodSchema, res);
   if (!validation) return;
 
   if ((await User.find({ email })).length > 0) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'This email is in use',
-    });
+    return next(new AppError('This email is in use', 400));
   }
 
   const newUser = await User.create(userData);
@@ -42,33 +35,22 @@ const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Please fill the login form',
-    });
+    return next(new AppError('Please fill the login form', 400));
   }
 
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'User not found. Please create an account.',
-    });
+    return next(new AppError('User not found. Please create an account.', 400));
   }
 
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
   if (!isPasswordCorrect) {
-    return res.status(401).json({
-      status: 'fail',
-      message: 'Incorrect password',
-    });
+    return next(new AppError('Incorrect password', 401));
   }
 
-  const token = jwt.sign(
-    { id: user._id, email: user.email },
-    process.env.JWT_SECURE as string,
-    { expiresIn: '1h' }
-  );
+  const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECURE as string, {
+    expiresIn: '1h',
+  });
 
   res.cookie('token', token, {
     httpOnly: true,
@@ -84,13 +66,12 @@ const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
   });
 });
 
-const logoutUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  //  Clear the cookie by setting an empty value & expiration
+const logoutUser = catchAsync(async (_req: Request, res: Response, _next: NextFunction) => {
   res.cookie('token', '', {
     httpOnly: true,
     secure: false,
     sameSite: 'strict',
-    expires: new Date(0), // Expire immediately
+    expires: new Date(0),
   });
 
   return res.status(200).json({
@@ -98,4 +79,5 @@ const logoutUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     message: 'Logged out successfully',
   });
 });
+
 export { registerUser, loginUser, logoutUser };
