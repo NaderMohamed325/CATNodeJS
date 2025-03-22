@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
 import { authRouter } from './routes/authRoute';
 import xXssProtection from 'x-xss-protection';
 import { userRouter } from './routes/userRoute';
-import { createAdminAccount } from './models/adminModel';
+
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -21,7 +21,6 @@ const limiter = rateLimit({
 
 mongoose.connect('mongodb://localhost:27017/E-Commerce').then(() => {
   console.log('DB connected');
-  createAdminAccount(); // Ensure this is called after the DB connection is established
 });
 
 const app = express();
