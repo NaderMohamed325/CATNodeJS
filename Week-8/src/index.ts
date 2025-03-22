@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
+
 import express, { Request, Response } from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
@@ -10,6 +11,8 @@ import mongoose from 'mongoose';
 import { authRouter } from './routes/authRoute';
 import xXssProtection from 'x-xss-protection';
 import { userRouter } from './routes/userRoute';
+import { adminRouter } from './routes/adminRoute';
+import cookieParser from 'cookie-parser';
 
 
 const limiter = rateLimit({
@@ -30,10 +33,11 @@ app.use(helmet());
 app.use(limiter);
 app.use(express.json());
 app.use(morgan('dev'));
-
+app.use(cookieParser());
 // Swagger setup
 setupSwagger(app);
 app.use(authRouter);
+app.use(adminRouter);
 app.use(userRouter);
 app.use(errorHandler);
 
@@ -44,3 +48,4 @@ app.all('*', (_req, res: Response) => {
 app.listen(5000, () => {
   console.log('Server running on http://localhost:5000');
 });
+
