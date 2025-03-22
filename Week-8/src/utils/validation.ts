@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { catchAsync } from './catchAsync';
+import { User } from '../models/userModel';
 
 const zodSchemaValidate = (data: any, schema: z.ZodSchema, res: Response) => {
   const result = schema.safeParse(data);
@@ -29,15 +30,5 @@ const authenticate = catchAsync(async (req: Request, res: Response, next: NextFu
   next();
 });
 
-const adminRouteProtect = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const role = req.user?.role;
-  if (role === 'admin') {
-    next();
-  } else if (role === 'user') {
-    return res.status(403).json({
-      status: 'fail',
-      message: 'Contact e-commerce@io.com',
-    });
-  }
-});
-export { zodSchemaValidate, authenticate,adminRouteProtect };
+
+export { zodSchemaValidate, authenticate };
