@@ -3,33 +3,37 @@ import { catchAsync } from '../utils/catchAsync';
 import { User } from '../models/userModel';
 import { AppError } from '../utils/appError';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-const getAllUsers = catchAsync(async (_req: Request, res: Response, _next: NextFunction) => {
-  const Users = await User.find();
-  try {
-    res.status(200).json({
-      status: 'success',
-      length: Users.length,
-      data: {
-        Users,
-      },
-    });
-  } catch (_) {
-    res.status(500).json({
-      status: 'fail',
-      message: 'Error fetching data',
-    });
+const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return next(new AppError('JWT token is missing', 401));
   }
+  const decoded = jwt.decode(token) as JwtPayload;
+  if (decoded.role !== 'admin') {
+    return next(new AppError('Invalid or expired token', 401));
+  }
+  const users = await User.find({ role: 'user' }).select(['-role','-password']);
+  return res.status(200).json({
+    status: 'success',
+    length: users.length,
+    data: {
+      users,
+    },
+  });
 });
 
 const adminLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const existingToken = req.cookies.token ;
-  console.log(req.cookies.token); //needed cookies parser
-  if (existingToken) {
+  const token = req.cookies.token;
+
+  if (token) {
     try {
-      jwt.verify(existingToken, process.env.JWT_SECURE as string);
-      return next(new AppError('You are already logged in', 400));
+      const decoded = jwt.verify(token, process.env.JWT_SECURE as string) as JwtPayload;
+      if (decoded.role === 'admin') {
+        return next(new AppError('You are already logged in', 400));
+      }
+      return next(new AppError('Invalid or expired token', 401));
     } catch (error) {
       return next(new AppError('Invalid or expired token', 401));
     }
@@ -50,12 +54,15 @@ const adminLogin = catchAsync(async (req: Request, res: Response, next: NextFunc
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  if (admin.role === 'user') {
-    return next(new AppError('Incorrect email or password', 403));
+  if (admin.role !== 'admin') {
+    return next(new AppError('Access denied', 403));
   }
 
-  const token = jwt.sign({ id: admin._id }, process.env.JWT_SECURE as string, { expiresIn: '1h' });
-  res.cookie('token', token, {
+  const newToken = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECURE as string, {
+    expiresIn: '1h',
+  });
+
+  res.cookie('token', newToken, {
     httpOnly: true,
     secure: false,
     sameSite: 'strict',
@@ -64,7 +71,7 @@ const adminLogin = catchAsync(async (req: Request, res: Response, next: NextFunc
 
   res.status(200).json({
     status: 'success',
-    message: 'Admin LogedIn successfully',
+    message: 'Admin logged in successfully',
   });
 });
 
