@@ -4,8 +4,10 @@ import { User } from '../models/userModel';
 import { AppError } from '../utils/appError';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { zodSchemaValidate } from '../utils/validation';
+import { Product, productZodSchema } from '../models/productModel';
 
-const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const getAllUsers = catchAsync(async (_req: Request, res: Response, _next: NextFunction) => {
   const users = await User.find({ role: 'user' }).select(['-role', '-password']);
   return res.status(200).json({
     status: 'success',
@@ -90,4 +92,29 @@ const adminDeleteUser = catchAsync(async (req: Request, res: Response, next: Nex
   });
 });
 
-export { getAllUsers, adminLogin, adminDeleteUser };
+const adminCreateProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  /*
+  title: string;
+  description: string;
+  category: Category;
+  price: number;
+*/
+  const { title, description, category, price } = req.body;
+  if (!title || !description || !category || !price) {
+    return next(new AppError('Please Fill the product form', 400));
+  }
+  let product = { title, description, category, price };
+  const schemaVlidation = zodSchemaValidate(product, productZodSchema, res);
+
+  const Exist = await Product.findOne({title});
+  if (Exist) {
+    return next(new AppError('Product name must be unique', 404));
+  }
+  const newProduct = await Product.create(schemaVlidation);
+  return res.status(201).json({
+    status: 'success',
+    message: `The product has been created with id --> ${newProduct._id} `,
+  });
+});
+
+export { getAllUsers, adminLogin, adminDeleteUser, adminCreateProduct };
