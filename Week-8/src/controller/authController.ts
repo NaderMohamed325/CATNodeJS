@@ -48,6 +48,10 @@ const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
     return next(new AppError('Incorrect password', 401));
   }
 
+  if (user.role === 'admin') {
+    return next(new AppError('Incorrect email or password', 401));
+  }
+
   const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECURE as string, {
     expiresIn: '1h',
   });
@@ -61,7 +65,6 @@ const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
 
   return res.status(200).json({
     status: 'success',
-    token,
     message: 'Login successful',
   });
 });
