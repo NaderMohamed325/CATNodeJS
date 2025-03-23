@@ -24,7 +24,7 @@ const getAllUsers = catchAsync(async (_req: Request, res: Response, _next: NextF
 });
 
 const adminLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const existingToken = req.cookies.token || req.headers.authorization?.split(' ')[1];
+  const existingToken = req.cookies.token ;
   console.log(req.cookies.token); //needed cookies parser
   if (existingToken) {
     try {
@@ -64,7 +64,7 @@ const adminLogin = catchAsync(async (req: Request, res: Response, next: NextFunc
 
   res.status(200).json({
     status: 'success',
-    token,
+    message: 'Admin LogedIn successfully',
   });
 });
 
