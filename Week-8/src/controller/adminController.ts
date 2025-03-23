@@ -6,15 +6,7 @@ import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return next(new AppError('JWT token is missing', 401));
-  }
-  const decoded = jwt.decode(token) as JwtPayload;
-  if (decoded.role !== 'admin') {
-    return next(new AppError('Invalid or expired token', 401));
-  }
-  const users = await User.find({ role: 'user' }).select(['-role','-password']);
+  const users = await User.find({ role: 'user' }).select(['-role', '-password']);
   return res.status(200).json({
     status: 'success',
     length: users.length,
@@ -75,4 +67,27 @@ const adminLogin = catchAsync(async (req: Request, res: Response, next: NextFunc
   });
 });
 
-export { getAllUsers, adminLogin };
+const adminDeleteUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const userID = req.params.id;
+  if (!userID) {
+    return next(new AppError('Missing user ID', 400));
+  }
+
+  const userToDelete = await User.findById(userID);
+  if (!userToDelete) {
+    return next(new AppError('User not found', 404));
+  }
+
+  if (userToDelete.role !== 'user') {
+    return next(new AppError('You can only delete users with the **user** role', 404));
+  }
+
+  await User.findByIdAndDelete(userID);
+
+  return res.status(200).json({
+    status: 'success',
+    message: `User ${userID} has been deleted successfully`,
+  });
+});
+
+export { getAllUsers, adminLogin, adminDeleteUser };
