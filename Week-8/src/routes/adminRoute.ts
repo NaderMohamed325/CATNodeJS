@@ -52,5 +52,6 @@ const adminRouter = Router();
  *         description: User does not have admin privileges
  */
 adminRouter.post('/auth/admin/login', adminLogin);
+adminRouter.get('/users', getAllUsers);
 
 export { adminRouter };
