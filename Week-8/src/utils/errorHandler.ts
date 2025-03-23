@@ -10,7 +10,7 @@ const errorHandler = (err: AppError, _req: any, res: any, _next: any) => {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      expires: new Date(0), 
+      expires: new Date(0),
     });
   }
 
