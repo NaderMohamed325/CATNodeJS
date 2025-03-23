@@ -5,9 +5,17 @@ const authRouter = express.Router();
 
 /**
  * @swagger
+ * tags:
+ *   - name: Auth
+ *     description: User authentication and session management
+ */
+
+/**
+ * @swagger
  * /auth/register:
  *   post:
  *     summary: Register a new user
+ *     description: Creates a new user account.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -15,6 +23,10 @@ const authRouter = express.Router();
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
+ *               - username
+ *               - password
  *             properties:
  *               email:
  *                 type: string
@@ -27,10 +39,6 @@ const authRouter = express.Router();
  *                 type: string
  *                 format: password
  *                 example: "SecurePass123!"
- *             required:
- *               - email
- *               - username
- *               - password
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -64,6 +72,7 @@ authRouter.post('/auth/register', registerUser);
  * /auth/login:
  *   post:
  *     summary: Login a user
+ *     description: Authenticates a user and sets a JWT token in an HTTP-only cookie.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -71,6 +80,9 @@ authRouter.post('/auth/register', registerUser);
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
+ *               - password
  *             properties:
  *               email:
  *                 type: string
@@ -80,12 +92,15 @@ authRouter.post('/auth/register', registerUser);
  *                 type: string
  *                 format: password
  *                 example: "SecurePass123!"
- *             required:
- *               - email
- *               - password
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Login successful (JWT token is stored in an HTTP-only cookie)
+ *         headers:
+ *           Set-Cookie:
+ *             description: The JWT token is stored in a secure, HTTP-only cookie
+ *             schema:
+ *               type: string
+ *               example: "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=Strict"
  *         content:
  *           application/json:
  *             schema:
@@ -105,11 +120,18 @@ authRouter.post('/auth/login', loginUser);
  * @swagger
  * /auth/logout:
  *   post:
- *     summary: Logout a user by clearing the authentication cookie
+ *     summary: Logout a user
+ *     description: Clears the authentication cookie and logs out the user.
  *     tags: [Auth]
  *     responses:
  *       200:
- *         description: User logged out successfully
+ *         description: User logged out successfully (JWT cookie is cleared)
+ *         headers:
+ *           Set-Cookie:
+ *             description: Clears the authentication cookie by setting an expired date
+ *             schema:
+ *               type: string
+ *               example: "token=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
  *         content:
  *           application/json:
  *             schema:
