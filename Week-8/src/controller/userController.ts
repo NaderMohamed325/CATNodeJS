@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { AppError } from '../utils/appError';
 
 const getUserProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  const token = req.cookies.token;
 
   if (!token) {
     return next(new AppError('No token provided', 401));
@@ -29,7 +29,7 @@ const getUserProfile = catchAsync(async (req: Request, res: Response, next: Next
 });
 
 const updateUserProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  const token = req.cookies.token;
 
   if (!token) {
     return next(new AppError('No token provided', 401));
@@ -69,7 +69,6 @@ const updateUserProfile = catchAsync(async (req: Request, res: Response, next: N
 
       return res.status(200).json({
         status: 'success',
-        token: newToken,
         user,
       });
     } else {
