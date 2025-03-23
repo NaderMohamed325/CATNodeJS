@@ -13,7 +13,7 @@ import xXssProtection from 'x-xss-protection';
 import { userRouter } from './routes/userRoute';
 import { adminRouter } from './routes/adminRoute';
 import cookieParser from 'cookie-parser';
-
+import compression from 'compression';
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -27,6 +27,7 @@ mongoose.connect('mongodb://localhost:27017/E-Commerce').then(() => {
 });
 
 const app = express();
+app.use(compression());
 app.use(xXssProtection());
 app.disable('x-powered-by');
 app.use(helmet());
