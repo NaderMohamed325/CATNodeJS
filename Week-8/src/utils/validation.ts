@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { catchAsync } from './catchAsync';
-import { User } from '../models/userModel';
 
 const zodSchemaValidate = (data: any, schema: z.ZodSchema, res: Response) => {
   const result = schema.safeParse(data);
@@ -13,7 +12,7 @@ const zodSchemaValidate = (data: any, schema: z.ZodSchema, res: Response) => {
 };
 
 const authenticate = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+  const token = req.cookies.token;
 
   if (!token) {
     res.status(401).json({
@@ -29,6 +28,5 @@ const authenticate = catchAsync(async (req: Request, res: Response, next: NextFu
   }
   next();
 });
-
 
 export { zodSchemaValidate, authenticate };
