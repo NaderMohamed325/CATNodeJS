@@ -18,12 +18,7 @@
 - **PUT /products/{id}** – Update a product (Admin only)
 - **DELETE /products/{id}** – Delete a product (Admin only)
 
-## Categories
 
-- **GET /categories** – Get all categories
-- **POST /categories** – Create a new category (Admin only)
-- **PUT /categories/{id}** – Update a category (Admin only)
-- **DELETE /categories/{id}** – Delete a category (Admin only)
 
 ## Cart
 
