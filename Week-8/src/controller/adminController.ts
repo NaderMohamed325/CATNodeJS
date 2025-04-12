@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { zodSchemaValidate } from '../utils/validation';
 import { Product, productZodSchema } from '../models/productModel';
+import mongoose from 'mongoose';
 
 const getAllUsers = catchAsync(async (_req: Request, res: Response, _next: NextFunction) => {
   const users = await User.find({ role: 'user' }).select(['-role', '-password']);
@@ -106,7 +107,7 @@ const adminCreateProduct = catchAsync(async (req: Request, res: Response, next: 
   let product = { title, description, category, price };
   const schemaVlidation = zodSchemaValidate(product, productZodSchema, res);
 
-  const Exist = await Product.findOne({title});
+  const Exist = await Product.findOne({ title });
   if (Exist) {
     return next(new AppError('Product name must be unique', 404));
   }
@@ -117,4 +118,47 @@ const adminCreateProduct = catchAsync(async (req: Request, res: Response, next: 
   });
 });
 
-export { getAllUsers, adminLogin, adminDeleteUser, adminCreateProduct };
+//- **PUT /products/{id}** – Update a product (Admin only)
+
+const adminUpdateProduct = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(new AppError('Invalid product ID', 400));
+  }
+
+  const product = await Product.findByIdAndUpdate(id, req.body,{
+    new: true,
+    runValidators: true,
+  });
+  if (!product) {
+    return next(new AppError('No product with this id', 404));
+  }
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      product,
+    },
+  });
+});
+
+//- **DELETE /products/{id}** – Delete a product (Admin only)
+const adminDeleteProduct = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(new AppError('Invalid product ID', 400));
+  }
+
+  const product = await Product.findByIdAndDelete(id);
+  if (!product) {
+    return next(new AppError('No product with this id', 404));
+  }
+
+  return res.status(204).send(); 
+});
+
+
+
+
+export { getAllUsers, adminLogin, adminDeleteUser, adminCreateProduct,adminUpdateProduct,adminDeleteProduct };
