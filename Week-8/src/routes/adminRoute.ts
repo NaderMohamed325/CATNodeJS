@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { adminDeleteUser, adminLogin, getAllUsers } from '../controller/adminController';
+import {
+  adminDeleteProduct,
+  adminDeleteUser,
+  adminLogin,
+  adminUpdateProduct,
+  getAllUsers,
+} from '../controller/adminController';
 import { adminAuth } from '../utils/middlewares/adminAuth';
 
 const adminRouter = Router();
@@ -141,4 +147,48 @@ adminRouter.get('/users', adminAuth, getAllUsers);
  */
 
 adminRouter.delete('/users/:id', adminAuth, adminDeleteUser);
+/**
+ * @swagger
+ * /products/{id}:
+ *   delete:
+ *     summary: Delete a product by ID (Admin only)
+ *     description: Allows an admin to delete a product by providing the product ID.
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the product to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Product deleted successfully
+ *       400:
+ *         description: Invalid product ID
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: "fail"
+ *               message: "Invalid product ID"
+ *       403:
+ *         description: Forbidden - Admin privileges required
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: "fail"
+ *               message: "Admin privileges required"
+ *       404:
+ *         description: Product not found
+ *         content:
+ *           application/json:
+ *             example:
+ *               status: "fail"
+ *               message: "Product not found"
+ *       500:
+ *         description: Internal server error
+ */
+adminRouter.delete('/products/:id', adminAuth, adminDeleteProduct);
 export { adminRouter };
