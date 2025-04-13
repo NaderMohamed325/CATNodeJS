@@ -164,6 +164,42 @@ cartRouter.post('/cart', authenticate, cartAddItem);
  *         description: Internal server error
  */
 cartRouter.put('/cart/:id', authenticate, cartUpdateQuantity);
+
+/**
+ * @swagger
+ * /cart/clear:
+ *   delete:
+ *     summary: Clear all items from the cart
+ *     description: Removes all items from the user's cart and resets the total price to zero.
+ *     tags: [Cart]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully cleared the cart
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Cart has been cleared
+ *                 data:
+ *                   type: object
+ *                   description: The updated cart data
+ *       401:
+ *         description: Unauthorized (invalid token)
+ *       404:
+ *         description: Cart not found
+ *       500:
+ *         description: Internal server error
+ */
+
+cartRouter.delete('/cart/clear', authenticate, cartClear);
 /**
  * @swagger
  * /cart/{id}:
@@ -206,41 +242,5 @@ cartRouter.put('/cart/:id', authenticate, cartUpdateQuantity);
  */
 
 cartRouter.delete('/cart/:id', authenticate, cartDeleteItem);
-
-/**
- * @swagger
- * /cart/clear:
- *   delete:
- *     summary: Clear all items from the cart
- *     description: Removes all items from the user's cart and resets the total price to zero.
- *     tags: [Cart]
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Successfully cleared the cart
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
- *                 message:
- *                   type: string
- *                   example: Cart has been cleared
- *                 data:
- *                   type: object
- *                   description: The updated cart data
- *       401:
- *         description: Unauthorized (invalid token)
- *       404:
- *         description: Cart not found
- *       500:
- *         description: Internal server error
- */
-
-cartRouter.delete('/cart/clear', authenticate, cartClear);
 
 export { cartRouter };
