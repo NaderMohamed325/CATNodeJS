@@ -15,6 +15,7 @@ import { adminRouter } from './routes/adminRoute';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import { productRouter } from './routes/productRoute';
+import { cartRouter } from './routes/cartRoute';
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -36,13 +37,14 @@ app.use(limiter);
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(cookieParser());
-app.use(express.json({ limit: "10kb" })); 
+app.use(express.json({ limit: '10kb' }));
 // Swagger setup
 setupSwagger(app);
 app.use(authRouter);
 app.use(adminRouter);
 app.use(userRouter);
-app.use(productRouter)
+app.use(productRouter);
+app.use(cartRouter);
 app.use(errorHandler);
 
 app.all('*', (_req, res: Response) => {
@@ -52,4 +54,3 @@ app.all('*', (_req, res: Response) => {
 app.listen(5000, () => {
   console.log('Server running on http://localhost:5000');
 });
-
