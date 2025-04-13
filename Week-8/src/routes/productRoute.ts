@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { adminAuth } from '../utils/middlewares/adminAuth';
 import { adminCreateProduct } from '../controller/adminController';
-import { authenticate } from '../utils/validation';
+import { authenticate } from '../utils/middlewares/userAuth';
 import { getAllProducts, getOneProduct } from '../controller/productController';
 
 const productRouter = Router();
