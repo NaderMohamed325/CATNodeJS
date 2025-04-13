@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../utils/middlewares/userAuth';
-import { cartAddItem, getUserCart } from '../controller/cartController';
+import { cartAddItem, cartUpdateQuantity, getUserCart } from '../controller/cartController';
 
 /**
  * @swagger
@@ -46,7 +46,6 @@ const cartRouter = Router();
  *       404:
  *         description: Cart not found
  */
-
 
 cartRouter.get('/cart', authenticate, getUserCart);
 
@@ -106,4 +105,5 @@ cartRouter.get('/cart', authenticate, getUserCart);
 
 cartRouter.post('/cart', authenticate, cartAddItem);
 
+cartRouter.put('/cart/:id', authenticate, cartUpdateQuantity);
 export { cartRouter };
