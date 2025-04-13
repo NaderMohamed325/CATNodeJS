@@ -136,6 +136,15 @@ const cartClear = catchAsync(async (req: Request, res: Response, next: NextFunct
     return next(new AppError('Cart not found', 404));
   }
 
+  if (userCart.items.length === 0) {
+    return res.status(200).json({
+      status: 'success',
+      message: 'Cart is already empty',
+      data: userCart,
+    });
+  }
+
+  // Clear all items from the cart
   userCart.items = [];
   userCart.cart_price = 0;
 
