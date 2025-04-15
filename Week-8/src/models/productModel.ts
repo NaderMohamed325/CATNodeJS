@@ -1,44 +1,30 @@
 import mongoose from 'mongoose';
 import { z } from 'zod';
-
-enum Category {
-  ELECTRONICS = 'Electronics',
-  FASHION = 'Fashion',
-  HOME_APPLIANCES = 'Home Appliances',
-  BEAUTY = 'Beauty & Personal Care',
-  BOOKS = 'Books',
-  SPORTS = 'Sports & Outdoor',
-  TOYS = 'Toys & Games',
-  AUTOMOTIVE = 'Automotive',
-  GROCERY = 'Grocery',
-  HEALTH = 'Health & Wellness',
-}
+import { Category } from './categoryModel'; // Mongoose model for categories
 
 interface IProduct extends mongoose.Document {
   title: string;
   description: string;
-  category: Category;
+  category: string;
   price: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const productZodSchema = z.object({
-  title: z
-    .string()
-    .min(4, 'Title must be at least 4 characters')
-    .max(20, 'Title cannot exceed 20 characters'),
-  description: z
-    .string()
-    .min(4, 'Description must be at least 4 characters')
-    .max(200, 'Description cannot exceed 200 characters'),
-  category: z.nativeEnum(Category, {
-    errorMap: () => ({
-      message: `Invalid category provided. Valid categories: ${Object.values(Category).join(', ')}`,
+// Dynamic Zod Schema Function
+// models/productModel.ts
+const productZodSchema = async () => {
+  const categories = await Category.find().lean();
+  const validCategories = categories.map((c) => c.name);
+  return z.object({
+    title: z.string().min(4).max(20),
+    description: z.string().min(4).max(200),
+    category: z.enum([...validCategories] as [string, ...string[]], {
+      errorMap: () => ({ message: `Invalid category. Valid: ${validCategories.join(', ')}` }),
     }),
-  }),
-  price: z.number().min(0, 'Price must be a positive number'),
-});
+    price: z.number().min(0),
+  });
+};
 
 const productMongooseSchema = new mongoose.Schema<IProduct>(
   {
@@ -59,7 +45,6 @@ const productMongooseSchema = new mongoose.Schema<IProduct>(
     },
     category: {
       type: String,
-      enum: Object.values(Category),
       required: true,
     },
     price: {
@@ -73,4 +58,4 @@ const productMongooseSchema = new mongoose.Schema<IProduct>(
 
 const Product = mongoose.model<IProduct>('Product', productMongooseSchema);
 
-export { Product, Category, productZodSchema };
+export { Product, productZodSchema };
