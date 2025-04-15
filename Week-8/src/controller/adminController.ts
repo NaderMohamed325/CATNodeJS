@@ -105,7 +105,8 @@ const adminCreateProduct = catchAsync(async (req: Request, res: Response, next: 
     return next(new AppError('Please Fill the product form', 400));
   }
   let product = { title, description, category, price };
-  const schemaVlidation = zodSchemaValidate(product, productZodSchema, res);
+  const schema = await productZodSchema();
+  const schemaVlidation = zodSchemaValidate(product, schema, res);
 
   const Exist = await Product.findOne({ title });
   if (Exist) {
@@ -127,7 +128,7 @@ const adminUpdateProduct = catchAsync(async (req, res, next) => {
     return next(new AppError('Invalid product ID', 400));
   }
 
-  const product = await Product.findByIdAndUpdate(id, req.body,{
+  const product = await Product.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
   });
@@ -155,10 +156,14 @@ const adminDeleteProduct = catchAsync(async (req, res, next) => {
     return next(new AppError('No product with this id', 404));
   }
 
-  return res.status(204).send(); 
+  return res.status(204).send();
 });
 
-
-
-
-export { getAllUsers, adminLogin, adminDeleteUser, adminCreateProduct,adminUpdateProduct,adminDeleteProduct };
+export {
+  getAllUsers,
+  adminLogin,
+  adminDeleteUser,
+  adminCreateProduct,
+  adminUpdateProduct,
+  adminDeleteProduct,
+};
