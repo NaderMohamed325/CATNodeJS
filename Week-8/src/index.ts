@@ -16,6 +16,7 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import { productRouter } from './routes/productRoute';
 import { cartRouter } from './routes/cartRoute';
+import { categoryRouter } from './routes/categoryRoute';
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -40,6 +41,7 @@ app.use(cookieParser());
 app.use(express.json({ limit: '10kb' }));
 // Swagger setup
 setupSwagger(app);
+app.use(categoryRouter);
 app.use(authRouter);
 app.use(adminRouter);
 app.use(userRouter);
